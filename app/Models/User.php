@@ -41,6 +41,35 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    static function do_all(){
+        $data = User::paginate();
+        return $data;
+    }
+
+    static function do_show($id){
+        $data = User::where('id',$id)->get();
+        return $data;
+    }
+
+    static function do_save($request, $id = null){
+        if($id){
+        $data = User::findOrFail($id);
+        }else{
+        $data = new User;
+        }
+
+        $data->name  = $request['name'];
+        $data->email  = $request['email'];
+        $data->password  = $request['password'];
+        $data->save();
+        return $data;
+    }
+
+    static function do_delete($id){
+        $data = User::where('id',$id)->firstOrFail();
+        $data->delete();
+        return $data;
+    }
     // Rest omitted for brevity
 
     /**
