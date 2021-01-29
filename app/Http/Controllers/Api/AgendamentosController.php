@@ -19,7 +19,7 @@ class AgendamentosController extends Controller
      */
     public function index()
     {
-        $dados = Agendamentos::paginate();
+        $dados = Agendamentos::do_all();
         return (new ResponseResourceCollection($dados))->response();
     }
 
@@ -31,26 +31,20 @@ class AgendamentosController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'medicos_id' => 'required',
-            'pacientes_id' => 'required',
-            'data' => 'required',
-            'hora_ini' => 'required',
-            'hora_fin' => 'required',
-        ]);
+        $validate = $this->validate_inputs($request);
 
-        $dados = new Agendamentos();
-        $dados->medicos_id      = $request->input('medicos_id');
-        $dados->pacientes_id    = $request->input('pacientes_id');
-        $dados->data            = $request->input('data');
-        $dados->hora_ini        = $request->input('hora_ini');
-        $dados->hora_fin        = $request->input('hora_fin');
-        $dados->status          = $request->input('status');
-        $dados->save();
-
-        Log::info("Agendamento ID {$dados->id} created successfully.");
-
-        return (new RequestResource($dados))->response()->setStatusCode(Response::HTTP_CREATED);
+        if(!$validate){
+            $dados = Agendamentos::do_save($request);
+            if($dados){
+                Log::info("Agendamento ID {$dados->id} created successfully.");
+                return (new RequestResource($dados))->response()->setStatusCode(Response::HTTP_CREATED);
+            }else{
+                Log::info("Agendamento ID {$dados->id} problem registering new record.");
+                return response()->json(['message' => 'Problem registering new record.'], 404);
+            }
+        }else{
+            return response()->json(['message' => $validate], 404);
+        }        
     }
 
     /**
@@ -61,7 +55,7 @@ class AgendamentosController extends Controller
      */
     public function show($id)
     {
-        $dados = Agendamentos::where('id',$id)->get();
+        $dados = Agendamentos::do_show($id);
         return (new RequestResource($dados))->response();
     }
 
@@ -74,26 +68,20 @@ class AgendamentosController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'medicos_id' => 'required',
-            'pacientes_id' => 'required',
-            'data' => 'required',
-            'hora_ini' => 'required',
-            'hora_fin' => 'required',
-        ]);
-
-        $dados = Agendamentos::findOrFail($id);
-        $dados->medicos_id      = $request->input('medicos_id');
-        $dados->pacientes_id    = $request->input('pacientes_id');
-        $dados->data            = $request->input('data');
-        $dados->hora_ini        = $request->input('hora_ini');
-        $dados->hora_fin        = $request->input('hora_fin');
-        $dados->status          = $request->input('status');
-        $dados->save();
-
-        Log::info("Agendamento ID {$dados->id} updated successfully.");
-
-        return (new RequestResource($dados))->response();
+        $validate = $this->validate_inputs($request);
+        if(!$validate){
+            $dados = Agendamentos::do_save($request, $id);
+            if($dados){
+                Log::info("Agendamento ID {$dados->id} updated successfully.");
+                return (new RequestResource($dados))->response()->setStatusCode(Response::HTTP_CREATED);
+            }else{
+                Log::info("Agendamento ID {$dados->id} problem changing record.");
+                return response()->json(['message' => 'Problem changing record.'], 404);
+            }
+        }else{
+            return response()->json(['message' => $validate], 404);
+        }
+        
     }
 
     /**
@@ -104,11 +92,33 @@ class AgendamentosController extends Controller
      */
     public function destroy($id)
     {
-        $dados = Agendamentos::where('id',$id)->firstOrFail();
-        $dados->delete();
+        $dados = Agendamentos::do_delete($id);
+        if($dados){
+            Log::info("Agendamento ID {$dados->id} deleted successfully.");
+            return response(null, Response::HTTP_NO_CONTENT);
+        }else{
+            Log::info("Agendamento ID {$dados->id} problem deleting record.");
+            return response()->json(['message' => 'Problem deleting record.'], 404);
+        }        
+    }
 
-        Log::info("Agendamento ID {$dados->id} deleted successfully.");
-
-        return response(null, Response::HTTP_NO_CONTENT);
+     /**
+    * Validates input
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
+    public function validate_inputs($request)
+    {        
+        $verificar_email = Agendamentos::where('email','=',$request->email)->first();
+        if($verificar_email != null){
+            return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
+        }
+        if($request->name ==  null){
+            return response()->json(['message' => "Digite um nome."], 404);
+        }
+        if($request->email ==  null){
+            return response()->json(['message' => "Digite um e-mail."], 404);
+        }        
     }
 }

@@ -19,7 +19,7 @@ class PacientesController extends Controller
      */
     public function index()
     {
-        $dados = Pacientes::paginate();
+        $dados = Pacientes::do_all();
         return (new ResponseResourceCollection($dados))->response();
     }
 
@@ -31,25 +31,20 @@ class PacientesController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nome' => 'bail|required|string|max:255',
-            'email' => 'bail|required|string|max:255|email|unique:pacientes,email'
-        ]);
+        $validate = $this->validate_inputs($request);
 
-        $dados = new Pacientes();
-        $dados->nome = $request->input('nome');
-        $dados->cpf_cnpj = $request->input('cpf_cnpj');
-        $dados->email = $request->input('email');
-        $dados->telefone1 = $request->input('telefone1');
-        $dados->telefone2 = $request->input('telefone2');
-        $dados->cep = $request->input('cep');
-        $dados->endereco = $request->input('endereco');
-        $dados->numero = $request->input('numero');
-        $dados->save();
-
-        Log::info("Paciente ID {$dados->id} created successfully.");
-
-        return (new RequestResource($dados))->response()->setStatusCode(Response::HTTP_CREATED);
+        if(!$validate){
+            $dados = Pacientes::do_save($request);
+            if($dados){
+                Log::info("Paciente ID {$dados->id} created successfully.");
+                return (new RequestResource($dados))->response()->setStatusCode(Response::HTTP_CREATED);
+            }else{
+                Log::info("Paciente ID {$dados->id} problem registering new record.");
+                return response()->json(['message' => 'Problem registering new record.'], 404);
+            }
+        }else{
+            return response()->json(['message' => $validate], 404);
+        }        
     }
 
     /**
@@ -60,7 +55,7 @@ class PacientesController extends Controller
      */
     public function show($id)
     {
-        $dados = Pacientes::where('id',$id)->get();
+        $dados = Pacientes::do_show($id);
         return (new RequestResource($dados))->response();
     }
 
@@ -73,25 +68,20 @@ class PacientesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nome' => 'bail|required|string|max:255',
-            'email' => 'bail|required|string|max:255|email|unique:pacientes,email,'.$id
-        ]);
-
-        $dados = Pacientes::findOrFail($id);
-        $dados->nome = $request->input('nome');
-        $dados->cpf_cnpj = $request->input('cpf_cnpj');
-        $dados->email = $request->input('email');
-        $dados->telefone1 = $request->input('telefone1');
-        $dados->telefone2 = $request->input('telefone2');
-        $dados->cep = $request->input('cep');
-        $dados->endereco = $request->input('endereco');
-        $dados->numero = $request->input('numero');
-        $dados->save();
-
-        Log::info("Paciente ID {$dados->id} updated successfully.");
-
-        return (new RequestResource($dados))->response();
+        $validate = $this->validate_inputs($request);
+        if(!$validate){
+            $dados = Pacientes::do_save($request, $id);
+            if($dados){
+                Log::info("Paciente ID {$dados->id} updated successfully.");
+                return (new RequestResource($dados))->response()->setStatusCode(Response::HTTP_CREATED);
+            }else{
+                Log::info("Paciente ID {$dados->id} problem changing record.");
+                return response()->json(['message' => 'Problem changing record.'], 404);
+            }
+        }else{
+            return response()->json(['message' => $validate], 404);
+        }
+        
     }
 
     /**
@@ -102,11 +92,33 @@ class PacientesController extends Controller
      */
     public function destroy($id)
     {
-        $dados = Pacientes::where('id',$id)->firstOrFail();
-        $dados->delete();
+        $dados = Pacientes::do_delete($id);
+        if($dados){
+            Log::info("Paciente ID {$dados->id} deleted successfully.");
+            return response(null, Response::HTTP_NO_CONTENT);
+        }else{
+            Log::info("Paciente ID {$dados->id} problem deleting record.");
+            return response()->json(['message' => 'Problem deleting record.'], 404);
+        }        
+    }
 
-        Log::info("Paciente ID {$dados->id} deleted successfully.");
-
-        return response(null, Response::HTTP_NO_CONTENT);
+     /**
+    * Validates input
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
+    public function validate_inputs($request)
+    {        
+        $verificar_email = Pacientes::where('email','=',$request->email)->first();
+        if($verificar_email != null){
+            return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
+        }
+        if($request->name ==  null){
+            return response()->json(['message' => "Digite um nome."], 404);
+        }
+        if($request->email ==  null){
+            return response()->json(['message' => "Digite um e-mail."], 404);
+        }        
     }
 }
