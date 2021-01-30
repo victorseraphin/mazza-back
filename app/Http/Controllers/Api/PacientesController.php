@@ -68,7 +68,7 @@ class PacientesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validate = $this->validate_inputs($request);
+        $validate = $this->validate_inputs($request, $id);
         if(!$validate){
             $dados = Pacientes::do_save($request, $id);
             if($dados){
@@ -108,12 +108,20 @@ class PacientesController extends Controller
     * @param  \Illuminate\Http\Request  $request
     * @return \Illuminate\Http\Response
     */
-    public function validate_inputs($request)
-    {        
+    public function validate_inputs($request, $id = null)
+    {   
         $verificar_email = Pacientes::where('email','=',$request->email)->first();
-        if($verificar_email != null){
-            return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
-        }
+        if($id != null){
+            
+            if($verificar_email != null and $verificar_email->id != $id){
+                return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
+            }
+        }else{
+            if($verificar_email != null){
+                return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
+            }
+        }  
+        
         if($request->nome ==  null){
             return response()->json(['message' => "Digite um nome."], 404);
         }
