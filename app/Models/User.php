@@ -55,11 +55,11 @@ class User extends Authenticatable implements JWTSubject
         if($id){
             $data = User::findOrFail($id);
             if($request['password'] != null){
-                $data->password  = $request['password'];
+                $data->password  = Hash::make($request['password']);
             }
         }else{
             $data = new User;
-            $data->password  = $request['password'];
+            $data->password  = Hash::make($request['password']);
         }
 
         $data->name  = $request['name'];
