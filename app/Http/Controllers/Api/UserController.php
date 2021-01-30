@@ -9,7 +9,6 @@ use App\Http\Resources\RequestResource;
 use App\Http\Resources\ResponseResourceCollection;
 use App\Models\User;
 use Log;
-use Hash;
 
 class UserController extends Controller
 {
