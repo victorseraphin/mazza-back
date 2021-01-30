@@ -53,14 +53,17 @@ class User extends Authenticatable implements JWTSubject
 
     static function do_save($request, $id = null){
         if($id){
-        $data = User::findOrFail($id);
+            $data = User::findOrFail($id);
+            if($request['password'] != null){
+                $data->password  = $request['password'];
+            }
         }else{
-        $data = new User;
+            $data = new User;
+            $data->password  = $request['password'];
         }
 
         $data->name  = $request['name'];
         $data->email  = $request['email'];
-        $data->password  = $request['password'];
         $data->save();
         return $data;
     }

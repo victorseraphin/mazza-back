@@ -114,14 +114,19 @@ class UserController extends Controller
     public function validate_inputs($request, $id = null)
     {        
         $verificar_email = User::where('email','=',$request->email)->first();
-        if($id != null){
-            
+        if($id != null){            
             if($verificar_email != null and $verificar_email->id != $id){
                 return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
             }
         }else{
             if($verificar_email != null){
                 return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
+            }            
+            if($request->password ==  null){
+                return response()->json(['message' => "Digite uma senha."], 404);
+            }
+            if($request->confirma_senha ==  null){
+                return response()->json(['message' => "Confirme sua senha."], 404);
             }
         } 
         if($request->name ==  null){
@@ -129,12 +134,6 @@ class UserController extends Controller
         }
         if($request->email ==  null){
             return response()->json(['message' => "Digite um e-mail."], 404);
-        }
-        if($request->password ==  null){
-            return response()->json(['message' => "Digite uma senha."], 404);
-        }
-        if($request->confirma_senha ==  null){
-            return response()->json(['message' => "Confirme sua senha."], 404);
         }
         if($request->password != $request->confirma_senha){
             return response()->json(['message' => "A confirmação da senha não correspode com a senha!"], 404);
