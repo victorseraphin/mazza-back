@@ -111,8 +111,7 @@ class MedicosController extends Controller
     public function validate_inputs($request, $id = null)
     {        
         $verificar_email = Medicos::where('email','=',$request->email)->first();
-        if($id != null){
-            
+        if($id != null){            
             if($verificar_email != null and $verificar_email->id != $id){
                 return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
             }
