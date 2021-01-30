@@ -114,7 +114,7 @@ class MedicosController extends Controller
         if($verificar_email != null){
             return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
         }
-        if($request->name ==  null){
+        if($request->nome ==  null){
             return response()->json(['message' => "Digite um nome."], 404);
         }
         if($request->email ==  null){
