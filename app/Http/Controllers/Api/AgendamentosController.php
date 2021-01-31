@@ -20,7 +20,8 @@ class AgendamentosController extends Controller
     public function index()
     {
         $dados = Agendamentos::do_all();
-        return (new ResponseResourceCollection($dados))->response();
+        return response()->json($dados, 200);
+        //return (new ResponseResourceCollection($dados))->response();
     }
 
     /**
@@ -56,7 +57,8 @@ class AgendamentosController extends Controller
     public function show($id)
     {
         $dados = Agendamentos::do_show($id);
-        return (new RequestResource($dados))->response();
+        return response()->json($dados, 200);
+        //return (new ResponseResourceCollection($dados))->response();
     }
 
     /**

@@ -20,7 +20,8 @@ class UserController extends Controller
     public function index()
     {
         $dados = User::do_all();
-        return (new ResponseResourceCollection($dados))->response();
+        return response()->json($dados, 200);
+        //return (new ResponseResourceCollection($dados))->response();
     }
 
     /**
@@ -58,7 +59,8 @@ class UserController extends Controller
     public function show($id)
     {
         $dados = User::do_show($id);
-        return (new RequestResource($dados))->response();
+        return response()->json($dados, 200);
+        //return (new ResponseResourceCollection($dados))->response();
     }
 
     /**
