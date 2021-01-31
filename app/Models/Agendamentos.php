@@ -18,7 +18,7 @@ class Agendamentos extends Model
     protected $table ='agendamentos';
 
     static function do_all(){
-        $data = Agendamentos::paginate();
+        $data = Agendamentos::get();
         return $data;
     }
 

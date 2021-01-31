@@ -18,7 +18,7 @@ class Pacientes extends Model
     protected $table ='pacientes';
 
     static function do_all(){
-        $data = Pacientes::paginate();
+        $data = Pacientes::get();
         return $data;
     }
 

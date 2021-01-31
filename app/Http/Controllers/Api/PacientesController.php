@@ -20,7 +20,8 @@ class PacientesController extends Controller
     public function index()
     {
         $dados = Pacientes::do_all();
-        return (new ResponseResourceCollection($dados))->response();
+        return response()->json($dados, 200);
+        //return (new ResponseResourceCollection($dados))->response();
     }
 
     /**

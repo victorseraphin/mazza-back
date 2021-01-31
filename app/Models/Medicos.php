@@ -18,7 +18,7 @@ class Medicos extends Model
     protected $table = 'medicos';
 
     static function do_all(){
-        $data = Medicos::paginate();
+        $data = Medicos::get();
         return $data;
     }
 

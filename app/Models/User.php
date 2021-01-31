@@ -43,7 +43,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
     static function do_all(){
-        $data = User::paginate();
+        $data = User::get();
         return $data;
     }
 
