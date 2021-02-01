@@ -13,7 +13,7 @@ class Agendamentos extends Model
     use Notifiable;
     use SoftDeletes;
 
-    protected $fillable = ['id','Agendamentos_id','pacientes_id','data','hora_ini','hora_fin','status'];
+    protected $fillable = ['id','medicos_id','pacientes_id','data','hora_ini','hora_fin','status'];
     protected $hidden = ['created_at','updated_at','deleted_at'];
     protected $table ='agendamentos';
 

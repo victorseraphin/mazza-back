@@ -111,16 +111,21 @@ class AgendamentosController extends Controller
     * @return \Illuminate\Http\Response
     */
     public function validate_inputs($request)
-    {        
-        $verificar_email = Agendamentos::where('email','=',$request->email)->first();
-        if($verificar_email != null){
-            return response()->json(['message' => "Este e-mail já está cadastrado no sistema!"], 404);
+    {   
+        if($request->medicos_id ==  null){
+            return response()->json(['message' => "Escolha um medico."], 404);
         }
-        if($request->name ==  null){
-            return response()->json(['message' => "Digite um nome."], 404);
+        if($request->pacientes_id ==  null){
+            return response()->json(['message' => "Escolha um paciente."], 404);
         }
-        if($request->email ==  null){
-            return response()->json(['message' => "Digite um e-mail."], 404);
+        if($request->data ==  null){
+            return response()->json(['message' => "Digite uma data."], 404);
+        }
+        if($request->hora_ini ==  null){
+            return response()->json(['message' => "Digite um horário de início."], 404);
+        }
+        if($request->hora_fin ==  null){
+            return response()->json(['message' => "Digite um horário final."], 404);
         }        
     }
 }
