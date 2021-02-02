@@ -18,7 +18,10 @@ class Agendamentos extends Model
     protected $table ='agendamentos';
 
     static function do_all(){
-        $data = Agendamentos::get();
+        $data = Agendamentos::select('agendamentos.id','agendamentos.medicos_id','agendamentos.pacientes_id','agendamentos.data','agendamentos.hora_ini','agendamentos.hora_fin', 'medicos.nome as medico', 'pacientes.nome as paciente')
+        ->join('medicos', 'agendamentos.medicos_id', '=', 'medicos.id')
+        ->join('pacientes', 'agendamentos.pacientes_id', '=', 'pacientes.id')
+        ->get();
         return $data;
     }
 
@@ -29,9 +32,9 @@ class Agendamentos extends Model
 
     static function do_save($request, $id = null){
         if($id){
-        $data = Agendamentos::findOrFail($id);
+            $data = Agendamentos::findOrFail($id);
         }else{
-        $data = new Agendamentos;
+            $data = new Agendamentos;
         }
 
         $data->medicos_id       = $request['medicos_id'];
