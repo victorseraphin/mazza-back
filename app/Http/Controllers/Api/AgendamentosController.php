@@ -19,7 +19,18 @@ class AgendamentosController extends Controller
      */
     public function index()
     {
-        $dados = Agendamentos::do_all();
+        $data = Agendamentos::do_all();
+        $dados = [];
+        foreach($data as $linha){
+            $dados2 = [];
+            $dados2['id'] = (string)$linha->id;
+            $dados2['title'] = $linha->paciente;
+            $dados2['start'] = $linha->data.'T'.$linha->hora_ini;
+            $dados2['end'] = $linha->data.'T'.$linha->hora_fin;
+            $dados2['pacientes_id'] = $linha->pacientes_id;
+            $dados2['medicos_id'] = $linha->medicos_id;
+            array_push($dados, $dados2);
+        }
         return response()->json($dados, 200);
         //return (new ResponseResourceCollection($dados))->response();
     }
